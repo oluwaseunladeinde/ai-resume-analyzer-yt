@@ -246,3 +246,5 @@ export const prepareInstructions = ({
   Provide the feedback using the following format: ${AIResponseFormat}
   Return the analysis as a JSON object, without any other text and without the backticks.
   Do not include any other text or comments.`;
+
+export const MAX_UPLOAD_FILE_SIZE = 20 * 1024 * 1024;
