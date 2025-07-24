@@ -15,7 +15,7 @@ async function loadPdfJs(): Promise<any> {
     isLoading = true;
     // @ts-expect-error - pdfjs-dist/build/pdf.mjs is not a module
     loadPromise = import("pdfjs-dist/build/pdf.mjs").then((lib) => {
-        // Set the worker source to use local file
+        // Set the worker source to use a local file
         lib.GlobalWorkerOptions.workerSrc = "/pdf.worker.min.mjs";
         pdfjsLib = lib;
         isLoading = false;
@@ -35,7 +35,12 @@ export async function convertPdfToImage(
         const pdf = await lib.getDocument({ data: arrayBuffer }).promise;
         const page = await pdf.getPage(1);
 
-        const viewport = page.getViewport({ scale: 4 });
+        // Scale based on page size to balance quality and performance.
+        const baseViewport = page.getViewport({ scale: 1 });
+        const maxDimension = Math.max(baseViewport.width, baseViewport.height);
+        const scale = maxDimension > 800 ? 2 : 4; // Use lower scale for larger pages
+        const viewport = page.getViewport({ scale });
+
         const canvas = document.createElement("canvas");
         const context = canvas.getContext("2d");
 
