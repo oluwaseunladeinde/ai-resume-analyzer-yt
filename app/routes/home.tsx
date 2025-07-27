@@ -25,14 +25,26 @@ export default function Home() {
 
   useEffect(() => {
     const loadResumes = async () => {
-      setLoadingResumes(true);
 
-      const resumes = (await kv.list('resume:*', true)) as KVItem[];
-      const parsedResumes = resumes?.map((resume) => (
-          JSON.parse(resume.value) as Resume
-      ));
-      setResumes(parsedResumes || []);
-      setLoadingResumes(false);
+      try {
+        setLoadingResumes(true);
+
+        const resumes = (await kv.list('resume:*', true)) as KVItem[];
+        const parsedResumes = resumes?.map((resume) => {
+          try {
+            return JSON.parse(resume.value) as Resume;
+          } catch (error) {
+            console.warn('Failed to parse resume data:', error);
+            return null;
+          }
+        }).filter(Boolean) as Resume[];
+        setResumes(parsedResumes || []);
+      } catch (error) {
+        console.error('Failed to load resumes:', error);
+        setResumes([]);
+      } finally {
+        setLoadingResumes(false);
+      }
     }
     loadResumes()
   },[])
