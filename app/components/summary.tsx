@@ -1,9 +1,26 @@
 import ScoreBadge from "~/components/score-badge";
 import ScoreGauge from "~/components/score-gauge";
 
-const Category = ({ title, score }: { title: string, score: number }) => {
-    const textColor = score > 70 ? 'text-green-600'
-        : score > 49
+interface CategoryProps {
+  title: string;
+  score: number;
+}
+
+const SCORE_THRESHOLDS = {
+    EXCELLENT: 70,
+    GOOD: 49
+} as const;
+
+const FEEDBACK_CATEGORIES = [
+    { key: "toneAndStyle", title: "Tone & Style" },
+    { key: "content",       title: "Content" },
+    { key: "structure",     title: "Structure" },
+    { key: "skills",        title: "Skills" }
+] as const;
+
+const Category = ({ title, score }: CategoryProps) => {
+    const textColor = score > SCORE_THRESHOLDS.EXCELLENT ? 'text-green-600'
+        : score > SCORE_THRESHOLDS.GOOD
             ? 'text-yellow-600' : 'text-red-600';
 
     return (
@@ -13,7 +30,7 @@ const Category = ({ title, score }: { title: string, score: number }) => {
                     <p className="text-2xl">{title}</p>
                     <ScoreBadge score={score} />
                 </div>
-                <p className="text-2xl">
+                <p className="text-2xl" aria-label={`Score: ${score} out of 100`}>
                     <span className={textColor}>{score}</span>/100
                 </p>
             </div>
@@ -34,10 +51,9 @@ const Summary = ({ feedback }: { feedback: Feedback }) => {
                     </p>
                 </div>
             </div>
-            <Category title="Tone & Style" score={feedback.toneAndStyle.score} />
-            <Category title="Content" score={feedback.content.score} />
-            <Category title="Structure" score={feedback.structure.score} />
-            <Category title="Skills" score={feedback.skills.score} />
+            {FEEDBACK_CATEGORIES.map(({ key, title }) => (
+                <Category key={key} title={title} score={feedback[key].score} />
+            ))}
         </div>
     )
 }
