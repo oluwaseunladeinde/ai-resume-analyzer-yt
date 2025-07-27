@@ -4,8 +4,12 @@ export const SCORE_THRESHOLDS = {
 } as const;
 
 export const getScoreCategory = (score: number) => {
-    if (score > SCORE_THRESHOLDS.EXCELLENT) return 'excellent';
-    if (score > SCORE_THRESHOLDS.GOOD) return 'good';
+    if (score < 0 || score > 100) {
+        throw new Error('Score must be a number between 0 and 100');
+    }
+
+    if (score >= SCORE_THRESHOLDS.EXCELLENT) return 'excellent';
+    if (score >= SCORE_THRESHOLDS.GOOD) return 'good';
     return 'poor';
 };
 

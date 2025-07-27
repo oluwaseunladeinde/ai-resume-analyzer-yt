@@ -9,17 +9,30 @@ const ResumeCard = (
 
     const { fs } = usePuterStore();
     const [resumeUrl, setResumeUrl] = useState('');
+    const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
         const loadResume = async () => {
-            const blob = await fs.read(imagePath);
-            if(!blob) return;
-            let url = URL.createObjectURL(blob);
-            setResumeUrl(url);
+            try {
+               const blob = await fs.read(imagePath);
+               if(!blob) return;
+               const url = URL.createObjectURL(blob);
+               setResumeUrl(url);
+           } catch (error) {
+               console.error('Failed to load resume image:', error);
+           }
+            setIsLoading(false);
         }
 
         loadResume();
-    }, [imagePath]);
+
+        // Cleanup function to revoke object URL
+        return () => {
+            if (resumeUrl) {
+                URL.revokeObjectURL(resumeUrl);
+            }
+        };
+    }, [imagePath, resumeUrl]);
 
     return (
         <Link to={`/resume/${id}`} className="resume-card animate-in fade-in duration-1000">
@@ -33,7 +46,13 @@ const ResumeCard = (
                     <ScoreCircle score={feedback.overallScore} />
                 </div>
             </div>
-            {resumeUrl && (
+            {isLoading ? (
+                    <div className="gradient-border animate-in fade-in duration-1000">
+                            <div className="w-full h-[350px] max-sm:h-[200px] flex items-center justify-center bg-gray-100">
+                                <p className="text-gray-500">Loading...</p>
+                            </div>
+                        </div>
+                ) : resumeUrl && (
                 <div className="gradient-border animate-in fade-in duration-1000">
                     <div className="w-full h-full">
                         <img

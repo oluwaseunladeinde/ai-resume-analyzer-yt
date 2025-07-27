@@ -1,15 +1,12 @@
 import ScoreBadge from "~/components/score-badge";
 import ScoreGauge from "~/components/score-gauge";
 
+import { SCORE_THRESHOLDS } from "~/lib/score-utils";
+
 interface CategoryProps {
   title: string;
   score: number;
 }
-
-const SCORE_THRESHOLDS = {
-    EXCELLENT: 70,
-    GOOD: 49
-} as const;
 
 const FEEDBACK_CATEGORIES = [
     { key: "toneAndStyle", title: "Tone & Style" },
